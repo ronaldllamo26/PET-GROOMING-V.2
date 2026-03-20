@@ -7,7 +7,6 @@ if (isLoggedIn()) {
     exit;
 }
 
-// ✅ Dynamic services from database
 $pdo      = getPDO();
 $services = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY price ASC")->fetchAll();
 
@@ -20,157 +19,57 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
   <?php include 'includes/head.php'; ?>
   <style>
     /* ── MARQUEE ── */
-    .marquee-strip {
-      background: var(--tan);
-      padding: 0.85rem 0;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .marquee-inner {
-      display: inline-flex;
-      animation: marquee 20s linear infinite;
-    }
-    .marquee-item {
-      font-family: var(--font-body);
-      font-size: 0.68rem;
-      font-weight: 500;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--white);
-      padding: 0 2.5rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .marquee-dot {
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.5);
-      flex-shrink: 0;
-    }
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
+    .marquee-strip { background:var(--tan); padding:0.85rem 0; overflow:hidden; white-space:nowrap; }
+    .marquee-inner { display:inline-flex; animation:marquee 20s linear infinite; }
+    .marquee-item { font-family:var(--font-body); font-size:0.68rem; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:var(--white); padding:0 2.5rem; display:inline-flex; align-items:center; gap:1rem; }
+    .marquee-dot { width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.5); flex-shrink:0; }
+    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
     /* ── HOW IT WORKS ── */
-    .how-section {
-      padding: 6rem 0;
-      background: var(--brown);
-    }
-    .step-card { text-align: center; padding: 0 1.5rem; }
-    .step-number {
-      font-family: var(--font-display);
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: rgba(196,168,130,0.15);
-      line-height: 1;
-      margin-bottom: 0.8rem;
-    }
-    .step-icon {
-      width: 50px;
-      height: 50px;
-      background: rgba(196,168,130,0.12);
-      border: 1px solid rgba(196,168,130,0.25);
-      border-radius: var(--radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.2rem;
-    }
-    .step-icon svg { width: 20px; height: 20px; color: var(--tan); }
-    .step-title {
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--white);
-      margin-bottom: 0.5rem;
-    }
-    .step-desc { font-size: 0.83rem; color: rgba(255,255,255,0.55); line-height: 1.7; }
-    .step-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 1rem;
-    }
-    .step-arrow svg { width: 18px; height: 18px; color: rgba(196,168,130,0.25); }
+    .how-section { padding:6rem 0; background:var(--brown); }
+    .step-card { text-align:center; padding:0 1.5rem; }
+    .step-number { font-family:var(--font-display); font-size:3.5rem; font-weight:700; color:rgba(196,168,130,0.15); line-height:1; margin-bottom:0.8rem; }
+    .step-icon { width:50px; height:50px; background:rgba(196,168,130,0.12); border:1px solid rgba(196,168,130,0.25); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; margin:0 auto 1.2rem; }
+    .step-icon svg { width:20px; height:20px; color:var(--tan); }
+    .step-title { font-family:var(--font-display); font-size:1.15rem; font-weight:600; color:var(--white); margin-bottom:0.5rem; }
+    .step-desc { font-size:0.83rem; color:rgba(255,255,255,0.55); line-height:1.7; }
 
     /* ── SCROLL HINT ── */
-    .hero-scroll-hint {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      color: rgba(255,255,255,0.35);
-      font-size: 0.62rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-    .scroll-line {
-      width: 1px;
-      height: 36px;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.9; }
-    }
+    .hero-scroll-hint { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); z-index:2; display:flex; flex-direction:column; align-items:center; gap:6px; color:rgba(255,255,255,0.35); font-size:0.62rem; letter-spacing:2px; text-transform:uppercase; }
+    .scroll-line { width:1px; height:36px; background:linear-gradient(to bottom,rgba(255,255,255,0.35),transparent); animation:scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
 
-    /* ── CONTACT SECTION ── */
-    .contact-section {
-      padding: 5rem 0;
-      background: var(--white);
-      border-top: 1px solid var(--gray-light);
-    }
-    .contact-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: 1.6rem;
-    }
-    .contact-icon {
-      width: 38px;
-      height: 38px;
-      background: var(--cream);
-      border: 1px solid var(--gray-light);
-      border-radius: var(--radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .contact-icon svg { width: 16px; height: 16px; color: var(--brown-light); }
-    .contact-label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.15rem;
-    }
-    .contact-value { font-size: 0.9rem; color: var(--text); font-weight: 500; }
-    .hours-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.4rem 1.5rem;
-      font-size: 0.83rem;
-    }
-    .hours-day { color: var(--text-muted); }
-    .hours-time { color: var(--text); font-weight: 500; text-align: right; }
-
-    @media (max-width: 768px) {
-      .step-arrow { display: none; }
-    }
+    /* ── CONTACT ── */
+    .contact-section { padding:5rem 0; background:var(--white); border-top:1px solid var(--gray-light); }
+    .contact-item { display:flex; align-items:flex-start; gap:1rem; margin-bottom:1.6rem; }
+    .contact-icon { width:38px; height:38px; background:var(--cream); border:1px solid var(--gray-light); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .contact-icon svg { width:16px; height:16px; color:var(--brown-light); }
+    .contact-label { font-size:0.65rem; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.15rem; }
+    .contact-value { font-size:0.9rem; color:var(--text); font-weight:500; }
+    .hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1.5rem; font-size:0.83rem; }
+    .hours-day { color:var(--text-muted); }
+    .hours-time { color:var(--text); font-weight:500; text-align:right; }
   </style>
 </head>
 <body>
+
+<!-- ✅ Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="28" height="28">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+  <a href="#services" onclick="closeMobileMenu()">Services</a>
+  <a href="#how" onclick="closeMobileMenu()">How It Works</a>
+  <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
+  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;justify-content:center;">
+    <a href="login.php" class="btn-outline-site" onclick="closeMobileMenu()">Sign In</a>
+    <a href="register.php" class="btn-primary-site" onclick="closeMobileMenu()">Book Now</a>
+  </div>
+</div>
 
 <!-- ── NAVBAR ── -->
 <nav class="site-nav">
@@ -196,6 +95,11 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
     <div class="nav-actions">
       <a href="login.php" class="btn-outline-site btn-sm-site">Sign In</a>
       <a href="register.php" class="btn-primary-site btn-sm-site">Book Now</a>
+      <button class="mobile-menu-btn" onclick="openMobileMenu()">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+        </svg>
+      </button>
     </div>
   </div>
 </nav>
@@ -213,9 +117,7 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
             Your pet deserves<br/>
             the <em style="font-style:italic;color:var(--tan);">best care.</em>
           </h1>
-          <p class="hero-desc">
-            Professional grooming services designed for the comfort and well-being of your beloved companions. Book your session today.
-          </p>
+          <p class="hero-desc">Professional grooming services designed for the comfort and well-being of your beloved companions. Book your session today.</p>
           <div class="hero-cta">
             <a href="register.php" class="btn-primary-site" style="padding:0.85rem 2rem;">Book a Session</a>
             <a href="#services" class="btn-outline-site" style="padding:0.85rem 2rem;border-color:rgba(255,255,255,0.4);color:#fff;">View Services</a>
@@ -245,7 +147,7 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
   </div>
 </div>
 
-<!-- ── STATS STRIP ── -->
+<!-- ── STATS ── -->
 <section style="background:var(--cream-dark);border-bottom:1px solid var(--gray-light);">
   <div class="container">
     <div class="row text-center py-4">
@@ -283,49 +185,30 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
       'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80&auto=format&fit=crop',
     ];
+    $staticSvcs = [
+      ['name'=>'Bath & Dry','desc'=>'Gentle shampoo, conditioner, and professional blow-dry using pet-safe products.','price'=>'350.00'],
+      ['name'=>'Haircut & Styling','desc'=>'Breed-specific cuts or custom styles crafted by our experienced pet stylists.','price'=>'500.00'],
+      ['name'=>'Nail Trimming','desc'=>'Safe clipping and filing to keep your pet comfortable and scratch-free.','price'=>'150.00'],
+      ['name'=>'Full Spa Package','desc'=>'Bath, haircut, nail trim, ear cleaning, and a finishing spritz of pet cologne.','price'=>'900.00'],
+    ];
+    $displaySvcs = !empty($services) ? $services : $staticSvcs;
     ?>
     <div class="row g-4">
-      <?php if (empty($services)): ?>
-        <!-- Fallback static cards if no services in DB -->
-        <?php
-        $staticSvcs = [
-          ['name' => 'Bath & Dry', 'desc' => 'Gentle shampoo, conditioner, and professional blow-dry using pet-safe products.', 'price' => '350.00'],
-          ['name' => 'Haircut & Styling', 'desc' => 'Breed-specific cuts or custom styles crafted by our experienced pet stylists.', 'price' => '500.00'],
-          ['name' => 'Nail Trimming', 'desc' => 'Safe clipping and filing to keep your pet comfortable and scratch-free.', 'price' => '150.00'],
-          ['name' => 'Full Spa Package', 'desc' => 'Bath, haircut, nail trim, ear cleaning, and a finishing spritz of pet cologne.', 'price' => '900.00'],
-        ];
-        foreach ($staticSvcs as $idx => $s): ?>
-        <div class="col-md-6 col-lg-3">
-          <div class="service-card">
-            <img src="<?= $svcImgs[$idx % 4] ?>" alt="<?= htmlspecialchars($s['name']) ?>" class="service-card-img"/>
-            <div class="service-card-body">
-              <h5 class="service-card-title"><?= htmlspecialchars($s['name']) ?></h5>
-              <p class="service-card-desc"><?= htmlspecialchars($s['desc']) ?></p>
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="service-price">₱<?= $s['price'] ?> <small>/ session</small></div>
-                <a href="register.php" class="btn-primary-site btn-sm-site">Book</a>
-              </div>
+      <?php foreach ($displaySvcs as $idx => $s): ?>
+      <div class="col-md-6 col-lg-3">
+        <div class="service-card">
+          <img src="<?= $svcImgs[$idx % 4] ?>" alt="<?= htmlspecialchars($s['name']) ?>" class="service-card-img"/>
+          <div class="service-card-body">
+            <h5 class="service-card-title"><?= htmlspecialchars($s['name']) ?></h5>
+            <p class="service-card-desc"><?= htmlspecialchars($s['description'] ?? $s['desc'] ?? 'Professional grooming service.') ?></p>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="service-price">₱<?= number_format((float)$s['price'], 2) ?> <small>/ session</small></div>
+              <a href="register.php" class="btn-primary-site btn-sm-site">Book</a>
             </div>
           </div>
         </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <?php foreach ($services as $idx => $s): ?>
-        <div class="col-md-6 col-lg-3">
-          <div class="service-card">
-            <img src="<?= $svcImgs[$idx % 4] ?>" alt="<?= htmlspecialchars($s['name']) ?>" class="service-card-img"/>
-            <div class="service-card-body">
-              <h5 class="service-card-title"><?= htmlspecialchars($s['name']) ?></h5>
-              <p class="service-card-desc"><?= htmlspecialchars($s['description'] ?? 'Professional grooming service for your beloved pet.') ?></p>
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="service-price">₱<?= number_format($s['price'],2) ?> <small>/ session</small></div>
-                <a href="register.php" class="btn-primary-site btn-sm-site">Book</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
@@ -347,7 +230,6 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
         ['num'=>'04','title'=>'Visit & Enjoy','desc'=>'Bring your pet in and let us do the rest. Pick them up fresh and happy.','icon'=>'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z'],
       ];
       foreach ($steps as $i => $step): ?>
-
       <div class="col-md-3 col-6" style="position:relative;">
         <div class="step-card">
           <div class="step-number"><?= $step['num'] ?></div>
@@ -359,17 +241,14 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
           <h4 class="step-title"><?= $step['title'] ?></h4>
           <p class="step-desc"><?= $step['desc'] ?></p>
         </div>
-
-        <!-- Arrow between steps -->
         <?php if ($i < 3): ?>
-        <div style="position:absolute;top:60px;right:-12px;z-index:2;display:none;" class="d-md-block">
+        <div class="d-none d-md-flex" style="position:absolute;top:60px;right:-12px;z-index:2;align-items:center;justify-content:center;">
           <svg fill="none" stroke="rgba(196,168,130,0.25)" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
           </svg>
         </div>
         <?php endif; ?>
       </div>
-
       <?php endforeach; ?>
     </div>
   </div>
@@ -386,27 +265,13 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
       </div>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item tall">
-        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80&auto=format&fit=crop" alt="Dog after grooming"/>
-      </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&q=80&auto=format&fit=crop" alt="Dog portrait"/>
-      </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=400&q=80&auto=format&fit=crop" alt="Cat portrait"/>
-      </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1583511655826-05700d52f4d9?w=400&q=80&auto=format&fit=crop" alt="Husky dog"/>
-      </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&q=80&auto=format&fit=crop" alt="Labrador"/>
-      </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=400&q=80&auto=format&fit=crop" alt="Orange cat"/>
-      </div>
-      <div class="gallery-item tall">
-        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80&auto=format&fit=crop" alt="Cat groomed"/>
-      </div>
+      <div class="gallery-item tall"><img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80&auto=format&fit=crop" alt="Dog"/></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&q=80&auto=format&fit=crop" alt="Dog"/></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=400&q=80&auto=format&fit=crop" alt="Cat"/></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1583511655826-05700d52f4d9?w=400&q=80&auto=format&fit=crop" alt="Dog"/></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&q=80&auto=format&fit=crop" alt="Dog"/></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=400&q=80&auto=format&fit=crop" alt="Cat"/></div>
+      <div class="gallery-item tall"><img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80&auto=format&fit=crop" alt="Cat"/></div>
     </div>
   </div>
 </section>
@@ -425,8 +290,8 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
         <p class="section-eyebrow">Our Story</p>
         <h2 class="section-title">Passionate About Pets Since 2026</h2>
         <div class="divider-line"></div>
-        <p class="section-sub mb-3">PetMalu was founded on a simple belief — every pet deserves to be treated with the same care and attention we give our own family. Our certified groomers bring years of experience and genuine love for animals to every session.</p>
-        <p class="section-sub mb-4">We use only premium, pet-safe products and maintain the highest standards of hygiene and comfort in our studio. Your pet's well-being is always our top priority.</p>
+        <p class="section-sub mb-3">PetMalu was founded on a simple belief — every pet deserves to be treated with the same care and attention we give our own family.</p>
+        <p class="section-sub mb-4">We use only premium, pet-safe products and maintain the highest standards of hygiene and comfort in our studio.</p>
         <a href="register.php" class="btn-primary-site">Schedule a Visit</a>
       </div>
     </div>
@@ -506,7 +371,7 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
         <h2 class="section-title mb-3">Ready to Book Your Pet's Next Session?</h2>
         <div class="divider-line" style="margin:1rem auto 1.8rem;"></div>
         <p class="section-sub mb-4">Create a free account and schedule an appointment in under two minutes.</p>
-        <div class="d-flex gap-3 justify-content-center">
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
           <a href="register.php" class="btn-primary-site">Create Free Account</a>
           <a href="login.php" class="btn-outline-site">Sign In</a>
         </div>
@@ -559,7 +424,6 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
           </div>
         </div>
       </div>
-
       <div class="col-lg-4">
         <p class="section-eyebrow">Schedule</p>
         <h2 class="section-title" style="font-size:1.4rem;margin-bottom:1rem;">Business Hours</h2>
@@ -570,7 +434,6 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
           <span class="hours-day">Sunday</span><span class="hours-time" style="color:var(--danger);">Closed</span>
         </div>
       </div>
-
       <div class="col-lg-4">
         <p class="section-eyebrow">Reminders</p>
         <h2 class="section-title" style="font-size:1.4rem;margin-bottom:1rem;">Before You Visit</h2>
@@ -633,21 +496,24 @@ $pageTitle = 'PetMalu — Premium Pet Grooming Studio';
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const target = document.querySelector(a.getAttribute('href'));
     if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
   });
 });
-
-// Navbar shadow on scroll
 window.addEventListener('scroll', () => {
   const nav = document.querySelector('.site-nav');
-  nav.style.boxShadow = window.scrollY > 50
-    ? '0 2px 20px rgba(44,36,32,0.1)'
-    : 'none';
+  nav.style.boxShadow = window.scrollY > 50 ? '0 2px 20px rgba(44,36,32,0.1)' : 'none';
 });
+function openMobileMenu() {
+  document.getElementById('mobileMenu').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>

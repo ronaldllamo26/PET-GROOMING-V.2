@@ -2,10 +2,31 @@
 // includes/sidebar_admin.php
 $page = basename($_SERVER['PHP_SELF'], '.php');
 ?>
+
+<!-- ✅ Mobile Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ✅ Mobile Topbar Hamburger — insert before sidebar -->
+<button id="hamburgerBtn" onclick="toggleSidebar()"
+  style="display:none;position:fixed;top:14px;left:1rem;z-index:300;background:var(--white);border:1px solid var(--gray-light);border-radius:var(--radius);padding:0.4rem 0.6rem;cursor:pointer;">
+  <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+  </svg>
+</button>
+
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <a href="../../index.php" class="sidebar-brand">PawCare</a>
-    <div class="sidebar-role">Administrator</div>
+  <div class="sidebar-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <a href="../../index.php" class="sidebar-brand">PetMalu</a>
+      <div class="sidebar-role">Administrator</div>
+    </div>
+    <!-- ✅ Close button (mobile only) -->
+    <button onclick="closeSidebar()" id="sidebarCloseBtn"
+      style="display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted);">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
   </div>
 
   <nav class="sidebar-nav">
@@ -40,9 +61,36 @@ $page = basename($_SERVER['PHP_SELF'], '.php');
   </nav>
 
   <div class="sidebar-footer">
-    <a href="../../logout.php" class="sidebar-link" style="color: var(--danger);">
+    <a href="../../logout.php" class="sidebar-link" style="color:var(--danger);">
       <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
       Sign Out
     </a>
   </div>
 </aside>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// Show/hide hamburger and close button based on screen size
+function checkMobile() {
+  const isMobile = window.innerWidth <= 768;
+  document.getElementById('hamburgerBtn').style.display    = isMobile ? 'block' : 'none';
+  document.getElementById('sidebarCloseBtn').style.display = isMobile ? 'block' : 'none';
+}
+checkMobile();
+window.addEventListener('resize', checkMobile);
+
+// Close sidebar on link click (mobile)
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
+</script>
