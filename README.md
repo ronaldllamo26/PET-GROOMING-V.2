@@ -75,10 +75,10 @@ http://localhost/pawcare/login.php
 
 ## Default Login Accounts
 
-| Role  | Email               | Password   |
-|-------|---------------------|------------|
-| Admin | admin@pawcare.ph    | password   |
-| User  | maria@email.com     | password   |
+| Role  | Email                        | Password   |
+|-------|------------------------------|------------|
+| Admin | admin@pawcare.ph             | password   |
+| User  | campusthrift77@gmail.com     | password   |
 
 > **Important:** Change passwords immediately after first login!
 
