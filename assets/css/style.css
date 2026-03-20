@@ -639,41 +639,66 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ── ALERTS ── */
 .alert-site {
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1.1rem;
   border-radius: var(--radius);
   font-size: 0.85rem;
   margin-bottom: 1.2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.alert-site svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .alert-error {
-  background: rgba(139,46,46,0.08);
-  border: 1px solid rgba(139,46,46,0.25);
-  color: var(--danger);
+  background: rgba(139,46,46,0.05);
+  border: 1px solid rgba(139,46,46,0.2);
+  color: #7A2020;
 }
 
 .alert-success {
-  background: rgba(74,124,89,0.08);
-  border: 1px solid rgba(74,124,89,0.25);
-  color: var(--success);
+  background: rgba(74,124,89,0.05);
+  border: 1px solid rgba(74,124,89,0.2);
+  color: #3A6B47;
+}
+
+.alert-warning {
+  background: rgba(184,134,11,0.05);
+  border: 1px solid rgba(184,134,11,0.2);
+  color: #7A5C00;
+}
+
+.alert-info {
+  background: rgba(59,47,47,0.04);
+  border: 1px solid rgba(59,47,47,0.15);
+  color: #3B2F2F;
 }
 
 /* ── BADGES ── */
 .badge-site {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   padding: 0.28rem 0.75rem;
   border-radius: 3px;
 }
 
-.badge-pending   { background: rgba(184,134,11,0.1); color: var(--warning); border: 1px solid rgba(184,134,11,0.25); }
-.badge-confirmed { background: rgba(74,124,89,0.1);  color: var(--success); border: 1px solid rgba(74,124,89,0.25); }
-.badge-done      { background: rgba(59,47,47,0.08);  color: var(--brown);   border: 1px solid rgba(59,47,47,0.2); }
-.badge-cancelled { background: rgba(139,46,46,0.08); color: var(--danger);  border: 1px solid rgba(139,46,46,0.2); }
-.badge-admin     { background: rgba(196,168,130,0.2); color: var(--brown-light); border: 1px solid rgba(196,168,130,0.4); }
-.badge-user      { background: rgba(106,122,107,0.1); color: #4A7C59; border: 1px solid rgba(74,124,89,0.25); }
+.badge-pending   { background: rgba(184,134,11,0.08);  color: #8B6914; border: 1px solid rgba(184,134,11,0.2); }
+.badge-confirmed { background: rgba(74,124,89,0.08);   color: #3A6B47; border: 1px solid rgba(74,124,89,0.2); }
+.badge-done      { background: rgba(59,47,47,0.06);    color: #3B2F2F; border: 1px solid rgba(59,47,47,0.15); }
+.badge-cancelled { background: rgba(139,46,46,0.07);   color: #7A2020; border: 1px solid rgba(139,46,46,0.18); }
+.badge-noshow    { background: rgba(139,46,46,0.07);   color: #7A2020; border: 1px solid rgba(139,46,46,0.18); }
+.badge-admin     { background: rgba(196,168,130,0.15); color: #6B4F3A; border: 1px solid rgba(196,168,130,0.35); }
+.badge-user      { background: rgba(74,124,89,0.08);   color: #3A6B47; border: 1px solid rgba(74,124,89,0.2); }
 
 /* ── SIDEBAR ── */
 .layout {
@@ -982,3 +1007,132 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .badge-noshow { background: #fdecea; color: #c0392b; }
+
+/* ── STATUS BANNERS ── */
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.status-banner-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-banner-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.status-banner-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.2rem;
+}
+
+.status-banner-desc {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.status-banner.danger {
+  background: rgba(139,46,46,0.05);
+  border: 1px solid rgba(139,46,46,0.18);
+}
+.status-banner.danger .status-banner-icon { background: rgba(139,46,46,0.08); color: #7A2020; }
+.status-banner.danger .status-banner-title { color: #7A2020; }
+.status-banner.danger .status-banner-desc { color: #9B3535; }
+
+.status-banner.warning {
+  background: rgba(184,134,11,0.05);
+  border: 1px solid rgba(184,134,11,0.18);
+}
+.status-banner.warning .status-banner-icon { background: rgba(184,134,11,0.08); color: #7A5C00; }
+.status-banner.warning .status-banner-title { color: #7A5C00; }
+.status-banner.warning .status-banner-desc { color: #8B6914; }
+
+.status-banner.success {
+  background: rgba(74,124,89,0.05);
+  border: 1px solid rgba(74,124,89,0.18);
+}
+.status-banner.success .status-banner-icon { background: rgba(74,124,89,0.08); color: #3A6B47; }
+.status-banner.success .status-banner-title { color: #3A6B47; }
+.status-banner.success .status-banner-desc { color: #4A7C59; }
+
+.status-banner.info {
+  background: rgba(59,47,47,0.04);
+  border: 1px solid rgba(59,47,47,0.13);
+}
+.status-banner.info .status-banner-icon { background: rgba(59,47,47,0.06); color: #3B2F2F; }
+.status-banner.info .status-banner-title { color: #3B2F2F; }
+.status-banner.info .status-banner-desc { color: #5A4A44; }
+
+/* ── DEPOSIT STATUS INDICATORS ── */
+.deposit-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.deposit-indicator svg {
+  width: 13px;
+  height: 13px;
+}
+
+.deposit-indicator.unpaid   { color: #8B6914; }
+.deposit-indicator.uploaded { color: #2C5F8A; }
+.deposit-indicator.verified { color: #3A6B47; }
+
+/* ── IMPROVED STAT CARDS ── */
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-light);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  transition: var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); }
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: var(--cream);
+  border: 1px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon svg { width: 18px; height: 18px; }
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-top: 3px;
+}

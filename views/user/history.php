@@ -102,8 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'depos
         } elseif ($file['size'] > $maxSize) {
             $depositError = 'File too large. Max 5MB.';
         } else {
-            $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = uniqid('deposit_', true) . '.' . $ext;
+            $ext       = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $filename  = uniqid('deposit_', true) . '.' . $ext;
             $uploadDir = __DIR__ . '/../../assets/uploads/deposits/';
             move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
             $path = 'assets/uploads/deposits/' . $filename;
@@ -196,7 +196,17 @@ $rootPath  = '../../';
         <?php else: ?>
         <table class="table-site">
           <thead>
-            <tr><th>#</th><th>Pet</th><th>Service</th><th>Date &amp; Time</th><th>Price</th><th>Status</th><th>Deposit</th><th></th></tr>
+            <tr>
+              <th>#</th>
+              <th>Pet</th>
+              <th>Service</th>
+              <th>Date &amp; Time</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Deposit</th>
+              <th>Details</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
           <?php foreach ($appts as $i => $a): ?>
@@ -216,7 +226,7 @@ $rootPath  = '../../';
               <?php endif; ?>
             </td>
 
-            <!-- ✅ Deposit Column -->
+            <!-- Deposit Column -->
             <td>
               <?php if ($a['status'] === 'confirmed'): ?>
                 <?php if ($a['deposit_status'] === 'unpaid'): ?>
@@ -234,13 +244,35 @@ $rootPath  = '../../';
               <?php endif; ?>
             </td>
 
+            <!-- ✅ View Details -->
+            <td>
+              <button type="button" class="btn-ghost"
+                style="font-size:0.75rem;padding:0.3rem 0.8rem;white-space:nowrap;"
+                onclick="openDetailsModal(<?= htmlspecialchars(json_encode([
+                  'id'                  => $a['id'],
+                  'pet_name'            => $a['pet_name'],
+                  'service_name'        => $a['service_name'],
+                  'price'               => number_format($a['price'], 2),
+                  'appt_date'           => date('F j, Y', strtotime($a['appt_date'])),
+                  'appt_time'           => date('g:i A', strtotime($a['appt_time'])),
+                  'status'              => $a['status'],
+                  'notes'               => $a['notes'] ?? '',
+                  'deposit_status'      => $a['deposit_status'],
+                  'deposit_amount'      => $a['deposit_amount'] ? number_format($a['deposit_amount'], 2) : null,
+                  'cancellation_reason' => $a['cancellation_reason'] ?? '',
+                  'created_at'          => date('F j, Y', strtotime($a['created_at'])),
+                ])) ?>)">
+                View
+              </button>
+            </td>
+
+            <!-- Actions -->
             <td>
               <?php
                 $apptDateTime = strtotime($a['appt_date'] . ' ' . $a['appt_time']);
                 $hoursLeft    = ($apptDateTime - time()) / 3600;
                 $canCancel    = in_array($a['status'], ['pending','confirmed']) && $hoursLeft >= 24;
               ?>
-
               <div class="d-flex flex-column gap-1">
                 <?php if ($a['status'] === 'confirmed' && $a['deposit_status'] === 'unpaid'): ?>
                 <button type="button" class="btn-primary-site btn-sm-site"
@@ -294,18 +326,16 @@ $rootPath  = '../../';
   </div>
 </div>
 
-<!-- ✅ Deposit Modal -->
+<!-- Deposit Modal -->
 <div id="depositModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:var(--radius);padding:2rem;max-width:460px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
     <h5 style="color:var(--brown);margin-bottom:0.3rem;">Upload GCash Deposit</h5>
     <p id="depositModalDesc" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.2rem;"></p>
-
     <div style="background:#f0f8ff;border:1px solid #bee3f8;border-radius:var(--radius);padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.83rem;color:#2c5282;">
       📱 Send your deposit to:<br/>
       <strong>GCash: 0917-123-4567 (PawCare Grooming)</strong><br/>
       Then upload the screenshot below.
     </div>
-
     <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="action" value="deposit"/>
       <input type="hidden" name="appt_id" id="depositApptId"/>
@@ -331,6 +361,51 @@ $rootPath  = '../../';
   </div>
 </div>
 
+<!-- ✅ Details Modal -->
+<div id="detailsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:var(--radius);padding:2rem;max-width:480px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 style="color:var(--brown);margin:0;">Appointment Details</h5>
+      <button onclick="closeDetailsModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gray);">✕</button>
+    </div>
+
+    <div style="background:var(--cream);border-radius:var(--radius);padding:1.2rem;margin-bottom:1rem;">
+      <table style="width:100%;font-size:0.88rem;">
+        <tr><td style="color:var(--text-muted);padding:5px 0;width:40%;">Booking #</td><td id="d_id" style="font-weight:600;"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Pet</td><td id="d_pet" style="font-weight:600;"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Service</td><td id="d_service"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Price</td><td id="d_price" style="color:var(--brown);font-weight:600;"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Date</td><td id="d_date"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Time</td><td id="d_time"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Booked On</td><td id="d_created"></td></tr>
+        <tr><td style="color:var(--text-muted);padding:5px 0;">Status</td><td id="d_status"></td></tr>
+      </table>
+    </div>
+
+    <div id="d_deposit_wrap" style="background:#f0f8ff;border:1px solid #bee3f8;border-radius:var(--radius);padding:1rem;margin-bottom:1rem;display:none;">
+      <p style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;color:#2980b9;margin-bottom:0.5rem;font-weight:600;">Deposit Info</p>
+      <table style="width:100%;font-size:0.88rem;">
+        <tr><td style="color:var(--text-muted);padding:3px 0;width:40%;">Status</td><td id="d_deposit_status"></td></tr>
+        <tr id="d_deposit_amount_row"><td style="color:var(--text-muted);padding:3px 0;">Amount</td><td id="d_deposit_amount"></td></tr>
+      </table>
+    </div>
+
+    <div id="d_notes_wrap" style="background:var(--cream);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;display:none;">
+      <p style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:0.5rem;font-weight:600;">Special Notes</p>
+      <p id="d_notes" style="font-size:0.88rem;color:var(--text);margin:0;"></p>
+    </div>
+
+    <div id="d_cancel_wrap" style="background:#fdecea;border:1px solid #f5c6cb;border-radius:var(--radius);padding:1rem;margin-bottom:1rem;display:none;">
+      <p style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;color:#c0392b;margin-bottom:0.5rem;font-weight:600;">Cancellation Reason</p>
+      <p id="d_cancel_reason" style="font-size:0.88rem;color:#922b21;margin:0;"></p>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <button onclick="closeDetailsModal()" class="btn-primary-site btn-sm-site">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function openCancelModal(id, pet, date) {
   document.getElementById('cancelApptId').value = id;
@@ -349,6 +424,62 @@ function openDepositModal(id, pet, service) {
 }
 function closeDepositModal() {
   document.getElementById('depositModal').style.display = 'none';
+}
+function openDetailsModal(a) {
+  document.getElementById('d_id').textContent      = '#' + a.id;
+  document.getElementById('d_pet').textContent     = a.pet_name;
+  document.getElementById('d_service').textContent = a.service_name;
+  document.getElementById('d_price').textContent   = '₱' + a.price;
+  document.getElementById('d_date').textContent    = a.appt_date;
+  document.getElementById('d_time').textContent    = a.appt_time;
+  document.getElementById('d_created').textContent = a.created_at;
+
+  const statusColors = {
+    pending: '#e6a817', confirmed: '#27ae60',
+    done: '#7c5c3e', cancelled: '#c0392b', no_show: '#c0392b'
+  };
+  document.getElementById('d_status').innerHTML =
+    `<span style="font-weight:600;color:${statusColors[a.status]||'#333'}">${a.status.replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>`;
+
+  // Deposit
+  const depWrap = document.getElementById('d_deposit_wrap');
+  if (a.status === 'confirmed') {
+    depWrap.style.display = 'block';
+    const depLabels = { unpaid: '⚠ Unpaid', uploaded: '⏳ Verifying', verified: '✓ Verified' };
+    document.getElementById('d_deposit_status').textContent = depLabels[a.deposit_status] || '—';
+    const amtRow = document.getElementById('d_deposit_amount_row');
+    if (a.deposit_amount) {
+      amtRow.style.display = '';
+      document.getElementById('d_deposit_amount').textContent = '₱' + a.deposit_amount;
+    } else {
+      amtRow.style.display = 'none';
+    }
+  } else {
+    depWrap.style.display = 'none';
+  }
+
+  // Notes
+  const notesWrap = document.getElementById('d_notes_wrap');
+  if (a.notes) {
+    notesWrap.style.display = 'block';
+    document.getElementById('d_notes').textContent = a.notes;
+  } else {
+    notesWrap.style.display = 'none';
+  }
+
+  // Cancellation reason
+  const cancelWrap = document.getElementById('d_cancel_wrap');
+  if (a.cancellation_reason) {
+    cancelWrap.style.display = 'block';
+    document.getElementById('d_cancel_reason').textContent = a.cancellation_reason;
+  } else {
+    cancelWrap.style.display = 'none';
+  }
+
+  document.getElementById('detailsModal').style.display = 'flex';
+}
+function closeDetailsModal() {
+  document.getElementById('detailsModal').style.display = 'none';
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

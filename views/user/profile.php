@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ✅ Get full user data
 $userFullStmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
 $userFullStmt->execute([$user['id']]);
 $userFull = $userFullStmt->fetch();
@@ -57,16 +56,28 @@ $rootPath  = '../../';
         <?= htmlspecialchars(explode(' ', $_SESSION['user_name'])[0]) ?>
       </div>
     </div>
+
     <div class="content-pad">
 
       <?php if ($error): ?>
-      <div class="alert-site alert-error mb-3"><?= htmlspecialchars($error) ?></div>
+      <div class="alert-site alert-error">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+        </svg>
+        <?= htmlspecialchars($error) ?>
+      </div>
       <?php endif; ?>
       <?php if ($success): ?>
-      <div class="alert-site alert-success mb-3"><?= htmlspecialchars($success) ?></div>
+      <div class="alert-site alert-success">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <?= htmlspecialchars($success) ?>
+      </div>
       <?php endif; ?>
 
       <div class="row g-4">
+
         <!-- Personal Info -->
         <div class="col-md-6">
           <div class="card-site">
@@ -118,51 +129,89 @@ $rootPath  = '../../';
         </div>
       </div>
 
-      <!-- ✅ Account Status Card -->
+      <!-- Account Status Card -->
       <div class="card-site mt-4">
         <div class="card-header-site"><h5>Account Status</h5></div>
         <div class="card-body-site">
-          <div class="row g-3">
 
+          <div class="row g-3 mb-3">
+
+            <!-- Member Since -->
             <div class="col-md-4">
-              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;">
-                <p style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.3rem;">Member Since</p>
-                <p style="font-size:0.95rem;font-weight:600;color:var(--brown);margin:0;">
+              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;border:1px solid var(--gray-light);">
+                <p style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.4rem;font-weight:600;">Member Since</p>
+                <p style="font-size:0.92rem;font-weight:600;color:var(--brown);margin:0;">
                   <?= date('F Y', strtotime($userFull['created_at'])) ?>
                 </p>
               </div>
             </div>
 
+            <!-- No-Show Record -->
             <div class="col-md-4">
-              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;">
-                <p style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.3rem;">No-Show Record</p>
-                <p style="font-size:0.95rem;font-weight:600;margin:0;
-                  <?= $userFull['no_show_count'] >= 1 ? 'color:#e6a817;' : 'color:#27ae60;' ?>">
-                  <?= $userFull['no_show_count'] ?> / 2
-                  <?= $userFull['no_show_count'] >= 1 ? '⚠️' : '✓' ?>
-                </p>
+              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;border:1px solid var(--gray-light);">
+                <p style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.4rem;font-weight:600;">No-Show Record</p>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <?php if ($userFull['no_show_count'] >= 1): ?>
+                  <svg fill="none" stroke="#8B6914" stroke-width="1.5" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                  </svg>
+                  <p style="font-size:0.92rem;font-weight:600;color:#8B6914;margin:0;"><?= $userFull['no_show_count'] ?> / 2</p>
+                  <?php else: ?>
+                  <svg fill="none" stroke="#3A6B47" stroke-width="1.5" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p style="font-size:0.92rem;font-weight:600;color:#3A6B47;margin:0;"><?= $userFull['no_show_count'] ?> / 2</p>
+                  <?php endif; ?>
+                </div>
               </div>
             </div>
 
+            <!-- Account Status -->
             <div class="col-md-4">
-              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;">
-                <p style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.3rem;">Account Status</p>
-                <p style="font-size:0.95rem;font-weight:600;margin:0;
-                  <?= $userFull['is_suspended'] ? 'color:#c0392b;' : 'color:#27ae60;' ?>">
-                  <?= $userFull['is_suspended'] ? '🚫 Suspended' : '✓ Active' ?>
-                </p>
+              <div style="background:var(--cream);border-radius:var(--radius);padding:1rem 1.2rem;border:1px solid var(--gray-light);">
+                <p style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.4rem;font-weight:600;">Account Status</p>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <?php if ($userFull['is_suspended']): ?>
+                  <svg fill="none" stroke="#7A2020" stroke-width="1.5" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                  </svg>
+                  <p style="font-size:0.92rem;font-weight:600;color:#7A2020;margin:0;">Suspended</p>
+                  <?php else: ?>
+                  <svg fill="none" stroke="#3A6B47" stroke-width="1.5" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p style="font-size:0.92rem;font-weight:600;color:#3A6B47;margin:0;">Active</p>
+                  <?php endif; ?>
+                </div>
               </div>
             </div>
 
           </div>
 
+          <!-- Status Banner -->
           <?php if ($userFull['is_suspended']): ?>
-          <div style="background:#fdecea;border:1px solid #f5c6cb;border-radius:var(--radius);padding:1rem 1.2rem;margin-top:1rem;font-size:0.85rem;color:#922b21;">
-            🚫 Your account is currently suspended. Please contact us at <strong>hello@pawcare.ph</strong> or <strong>0917-123-4567</strong> to appeal.
+          <div class="status-banner danger">
+            <div class="status-banner-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+              </svg>
+            </div>
+            <div>
+              <p class="status-banner-title">Account Suspended</p>
+              <p class="status-banner-desc">Your account is currently suspended. Please contact us at <strong>hello@pawcare.ph</strong> or <strong>0917-123-4567</strong> to appeal.</p>
+            </div>
           </div>
           <?php elseif ($userFull['no_show_count'] === 1): ?>
-          <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius);padding:1rem 1.2rem;margin-top:1rem;font-size:0.85rem;color:#7c5c3e;">
-            ⚠️ You have <strong>1 no-show</strong> on record. A 2nd no-show will result in account suspension.
+          <div class="status-banner warning">
+            <div class="status-banner-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="status-banner-title">No-Show Warning</p>
+              <p class="status-banner-desc">You have <strong>1 no-show</strong> on record. A 2nd no-show will result in account suspension. Please cancel at least 24 hours in advance.</p>
+            </div>
           </div>
           <?php endif; ?>
 

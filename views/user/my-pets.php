@@ -12,7 +12,7 @@ $error = $success = '';
 // ✅ Handle photo upload
 function uploadPetPhoto($file) {
     $allowed   = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    $maxSize   = 3 * 1024 * 1024; // 3MB
+    $maxSize   = 3 * 1024 * 1024;
     $uploadDir = __DIR__ . '/../../assets/uploads/pets/';
 
     if ($file['error'] !== UPLOAD_ERR_OK) return null;
@@ -64,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $birthday = $_POST['birthday']       ?? null;
         $weight   = $_POST['weight']         ?? null;
 
-        // Get current photo
         $currStmt = $pdo->prepare('SELECT photo FROM pets WHERE id = ? AND user_id = ?');
         $currStmt->execute([$pid, $uid]);
         $currPhoto = $currStmt->fetchColumn();
@@ -75,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$newPhoto) {
                 $error = 'Invalid photo. Use JPG/PNG/WEBP under 3MB.';
             } else {
-                // ✅ Delete old photo if exists
                 if ($currPhoto && file_exists(__DIR__ . '/../../' . $currPhoto)) {
                     unlink(__DIR__ . '/../../' . $currPhoto);
                 }
@@ -96,7 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete') {
         $pid = (int)($_POST['pet_id'] ?? 0);
-        // ✅ Delete photo file too
         $currStmt = $pdo->prepare('SELECT photo FROM pets WHERE id = ? AND user_id = ?');
         $currStmt->execute([$pid, $uid]);
         $currPhoto = $currStmt->fetchColumn();
@@ -112,11 +109,20 @@ $stmt = $pdo->prepare('SELECT * FROM pets WHERE user_id = ? ORDER BY name');
 $stmt->execute([$uid]);
 $myPets = $stmt->fetchAll();
 
-$groomCount = [];
+// ✅ Grooming history per pet
+$groomHistory = [];
+$groomCount   = [];
 foreach ($myPets as $pet) {
-    $gc = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE pet_id = ? AND status = 'done'");
-    $gc->execute([$pet['id']]);
-    $groomCount[$pet['id']] = $gc->fetchColumn();
+    $gh = $pdo->prepare("
+        SELECT a.appt_date, a.appt_time, s.name AS service_name, s.price
+        FROM appointments a
+        JOIN services s ON a.service_id = s.id
+        WHERE a.pet_id = ? AND a.status = 'done'
+        ORDER BY a.appt_date DESC, a.appt_time DESC
+    ");
+    $gh->execute([$pet['id']]);
+    $groomHistory[$pet['id']] = $gh->fetchAll();
+    $groomCount[$pet['id']]   = count($groomHistory[$pet['id']]);
 }
 
 $petImgs = [
@@ -170,7 +176,6 @@ $rootPath  = '../../';
       <?php else: ?>
       <div class="row g-3">
         <?php foreach ($myPets as $pet):
-          // ✅ Use uploaded photo or fallback
           $img = !empty($pet['photo'])
             ? $rootPath . $pet['photo']
             : ($petImgs[$pet['pet_type']] ?? $petImgs['Others']);
@@ -182,11 +187,13 @@ $rootPath  = '../../';
               $diff = $now->diff($bd);
               $ageStr = $diff->y > 0 ? $diff->y . ' yr' . ($diff->y > 1 ? 's' : '') : $diff->m . ' mo';
           }
+
+          $history = $groomHistory[$pet['id']];
+          $count   = $groomCount[$pet['id']];
         ?>
         <div class="col-md-6 col-lg-4">
           <div class="pet-card">
-            <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($pet['name']) ?>" class="pet-card-img"
-                 style="object-fit:cover;"/>
+            <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($pet['name']) ?>" class="pet-card-img" style="object-fit:cover;"/>
             <div class="pet-card-body">
 
               <div class="d-flex justify-content-between align-items-start mb-1">
@@ -206,7 +213,20 @@ $rootPath  = '../../';
                 <?php if ($pet['weight']): ?>
                 <span style="font-size:0.75rem;background:var(--cream);color:var(--text-muted);padding:0.2rem 0.6rem;border-radius:20px;">⚖️ <?= $pet['weight'] ?> kg</span>
                 <?php endif; ?>
-                <span style="font-size:0.75rem;background:var(--cream);color:var(--text-muted);padding:0.2rem 0.6rem;border-radius:20px;">✂️ <?= $groomCount[$pet['id']] ?> session<?= $groomCount[$pet['id']] != 1 ? 's' : '' ?></span>
+                <!-- ✅ Clickable grooming sessions count -->
+                <button type="button"
+                 style="font-size:0.75rem;background:var(--cream);color:var(--text-muted);padding:0.2rem 0.7rem;border-radius:20px;border:1px solid var(--gray-light);cursor:<?= $count > 0 ? 'pointer' : 'default' ?>;display:inline-flex;align-items:center;gap:4px;transition:var(--transition);<?= $count > 0 ? 'border-color:var(--tan-light);' : '' ?>"
+                 <?= $count > 0 ? "onmouseenter=\"this.style.borderColor='var(--brown)';this.style.color='var(--brown)';\" onmouseleave=\"this.style.borderColor='var(--tan-light)';this.style.color='var(--text-muted)';\" onclick=\"openHistoryModal('" . htmlspecialchars($pet['name']) . "', " . htmlspecialchars(json_encode($history)) . ")\"" : '' ?>>
+                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="13" height="13">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.848 8.25l1.536.887M7.848 8.25a3 3 0 11-5.196-3 3 3 0 015.196 3zm1.536.887a2.165 2.165 0 011.083 1.839c.005.351.054.695.14 1.024M9.384 9.137l2.077 1.199M7.848 15.75l1.536-.887m-1.536.887a3 3 0 11-5.196 3 3 3 0 015.196-3zm1.536-.887a2.165 2.165 0 001.083-1.838c.005-.352.054-.695.14-1.025m-1.223 2.863l2.077-1.199m0-3.328a2.165 2.165 0 010 3.328m0-3.328l-2.077-1.2m2.077 4.528l-2.077-1.199"/>
+                 </svg>
+                 <?= $count ?> session<?= $count != 1 ? 's' : '' ?>
+                 <?php if ($count > 0): ?>
+                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="11" height="11" style="opacity:0.5;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                  </svg>
+                    <?php endif; ?>
+                 </button>
               </div>
 
               <?php if ($pet['notes']): ?>
@@ -215,8 +235,11 @@ $rootPath  = '../../';
               </p>
               <?php endif; ?>
 
-              <div class="d-flex gap-2 mt-2">
-                <a href="book.php" class="btn-outline-site btn-sm-site flex-fill text-center">Book Session</a>
+              <div class="d-flex gap-2 mt-2 flex-wrap">
+                <!-- ✅ Rebook — prefills book.php with pet_id -->
+                <a href="book.php?pet_id=<?= $pet['id'] ?>" class="btn-outline-site btn-sm-site flex-fill text-center">
+                  <?= $count > 0 ? 'Rebook' : 'Book Session' ?>
+                </a>
                 <button type="button" class="btn-ghost"
                   onclick="openEditModal(<?= htmlspecialchars(json_encode($pet)) ?>)">Edit</button>
                 <form method="POST" onsubmit="return confirm('Remove <?= htmlspecialchars($pet['name']) ?>?');">
@@ -249,8 +272,6 @@ $rootPath  = '../../';
         <input type="hidden" name="action" value="add"/>
         <div class="modal-body p-4">
           <div class="row g-3">
-
-            <!-- ✅ Photo Upload -->
             <div class="col-12">
               <label class="form-label-site">Pet Photo</label>
               <div id="addPhotoPreviewWrap" style="display:none;margin-bottom:0.5rem;">
@@ -261,7 +282,6 @@ $rootPath  = '../../';
                      onchange="previewPhoto(this, 'addPhotoPreview', 'addPhotoPreviewWrap')"/>
               <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">JPG, PNG or WEBP. Max 3MB. Optional.</p>
             </div>
-
             <div class="col-md-6">
               <label class="form-label-site">Pet Name *</label>
               <input type="text" name="name" class="form-control-site" placeholder="e.g., Max" required/>
@@ -325,8 +345,6 @@ $rootPath  = '../../';
         <input type="hidden" name="pet_id" id="editPetId"/>
         <div class="modal-body p-4">
           <div class="row g-3">
-
-            <!-- ✅ Photo Upload -->
             <div class="col-12">
               <label class="form-label-site">Pet Photo</label>
               <div id="editPhotoPreviewWrap" style="margin-bottom:0.5rem;">
@@ -337,7 +355,6 @@ $rootPath  = '../../';
                      onchange="previewPhoto(this, 'editPhotoPreview', null)"/>
               <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Leave blank to keep current photo.</p>
             </div>
-
             <div class="col-md-6">
               <label class="form-label-site">Pet Name *</label>
               <input type="text" name="name" id="editName" class="form-control-site" required/>
@@ -387,6 +404,25 @@ $rootPath  = '../../';
   </div>
 </div>
 
+<!-- ✅ Grooming History Modal -->
+<div id="historyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:var(--radius);padding:2rem;max-width:480px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);max-height:85vh;overflow-y:auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div style="display:flex;align-items:center;gap:8px;">
+  <svg fill="none" stroke="var(--brown)" stroke-width="1.5" viewBox="0 0 24 24" width="18" height="18">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M7.848 8.25l1.536.887M7.848 8.25a3 3 0 11-5.196-3 3 3 0 015.196 3zm1.536.887a2.165 2.165 0 011.083 1.839c.005.351.054.695.14 1.024M9.384 9.137l2.077 1.199M7.848 15.75l1.536-.887m-1.536.887a3 3 0 11-5.196 3 3 3 0 015.196-3zm1.536-.887a2.165 2.165 0 001.083-1.838c.005-.352.054-.695.14-1.025m-1.223 2.863l2.077-1.199m0-3.328a2.165 2.165 0 010 3.328m0-3.328l-2.077-1.2m2.077 4.528l-2.077-1.199"/>
+  </svg>
+  <h5 style="color:var(--brown);margin:0;">Grooming History — <span id="historyPetName"></span></h5>
+</div>
+      <button onclick="closeHistoryModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gray);">✕</button>
+    </div>
+    <div id="historyList"></div>
+    <div class="d-flex justify-content-end mt-3">
+      <button onclick="closeHistoryModal()" class="btn-primary-site btn-sm-site">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function previewPhoto(input, previewId, wrapId) {
   const preview = document.getElementById(previewId);
@@ -410,7 +446,6 @@ function openEditModal(pet) {
   document.getElementById('editWeight').value   = pet.weight   || '';
   document.getElementById('editNotes').value    = pet.notes    || '';
 
-  // ✅ Show current photo in edit modal
   const preview = document.getElementById('editPhotoPreview');
   if (pet.photo) {
     preview.src = '../../' + pet.photo;
@@ -424,8 +459,48 @@ function openEditModal(pet) {
     };
     preview.src = fallbacks[pet.pet_type] || fallbacks['Others'];
   }
-
   new bootstrap.Modal(document.getElementById('editPetModal')).show();
+}
+
+// ✅ Grooming History Modal
+function openHistoryModal(petName, history) {
+  document.getElementById('historyPetName').textContent = petName;
+  const list = document.getElementById('historyList');
+
+  if (!history || history.length === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);text-align:center;">No grooming sessions yet.</p>';
+  } else {
+    let html = '<table style="width:100%;font-size:0.88rem;border-collapse:collapse;">';
+    html += '<thead><tr style="border-bottom:2px solid var(--gray-light);">';
+    html += '<th style="padding:8px 6px;color:var(--text-muted);font-weight:500;text-align:left;">Date</th>';
+    html += '<th style="padding:8px 6px;color:var(--text-muted);font-weight:500;text-align:left;">Service</th>';
+    html += '<th style="padding:8px 6px;color:var(--text-muted);font-weight:500;text-align:right;">Price</th>';
+    html += '</tr></thead><tbody>';
+
+    history.forEach((h, i) => {
+      const date = new Date(h.appt_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+      const time = h.appt_time.substring(0,5);
+      const bg   = i % 2 === 0 ? 'background:var(--cream);' : '';
+      html += `<tr style="${bg}border-bottom:1px solid var(--gray-light);">`;
+      html += `<td style="padding:8px 6px;">${date}<br/><span style="font-size:0.75rem;color:var(--text-muted);">${time}</span></td>`;
+      html += `<td style="padding:8px 6px;">${h.service_name}</td>`;
+      html += `<td style="padding:8px 6px;text-align:right;color:var(--brown);font-weight:600;">₱${parseFloat(h.price).toFixed(2)}</td>`;
+      html += '</tr>';
+    });
+
+    const total = history.reduce((sum, h) => sum + parseFloat(h.price), 0);
+    html += `<tr style="border-top:2px solid var(--gray-light);">`;
+    html += `<td colspan="2" style="padding:8px 6px;font-weight:600;">Total Spent</td>`;
+    html += `<td style="padding:8px 6px;text-align:right;color:#27ae60;font-weight:700;">₱${total.toFixed(2)}</td>`;
+    html += '</tr>';
+    html += '</tbody></table>';
+    list.innerHTML = html;
+  }
+
+  document.getElementById('historyModal').style.display = 'flex';
+}
+function closeHistoryModal() {
+  document.getElementById('historyModal').style.display = 'none';
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

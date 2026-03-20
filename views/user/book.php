@@ -111,6 +111,10 @@ $slots = ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00
 
 $pageTitle = 'Book Appointment';
 $rootPath  = '../../';
+
+// ✅ Auto-select pet from rebook
+$prebookPetId = (int)($_GET['pet_id'] ?? 0);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,7 +160,7 @@ $rootPath  = '../../';
                     <select name="pet_id" class="form-control-site" required>
                       <option value="">— Choose your pet —</option>
                       <?php foreach ($myPets as $p): ?>
-                      <option value="<?= $p['id'] ?>" <?= ($_POST['pet_id'] ?? '') == $p['id'] ? 'selected' : '' ?>>
+                      <option value="<?= $p['id'] ?>" <?= (($_POST['pet_id'] ?? $prebookPetId) == $p['id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($p['name']) ?> (<?= htmlspecialchars($p['breed'] ?: $p['pet_type']) ?>)
                       </option>
                       <?php endforeach; ?>

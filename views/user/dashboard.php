@@ -55,22 +55,30 @@ $rootPath  = '../../';
 
     <div class="content-pad">
 <?php if ($userData['is_suspended']): ?>
-<div style="background:#fdecea;border:1px solid #f5c6cb;border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.8rem;">
-  <span style="font-size:1.3rem;">🚫</span>
+<div class="status-banner danger">
+  <div class="status-banner-icon">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+    </svg>
+  </div>
   <div>
-    <strong style="color:#c0392b;font-size:0.9rem;">Account Suspended</strong>
-    <p style="color:#922b21;font-size:0.83rem;margin:0.2rem 0 0;">Your account has been suspended due to repeated no-shows. You cannot make new bookings. Please contact us to appeal.</p>
+    <p class="status-banner-title">Account Suspended</p>
+    <p class="status-banner-desc">Your account has been suspended due to repeated no-shows. You cannot make new bookings. Please contact us to appeal.</p>
   </div>
 </div>
 <?php elseif ($userData['no_show_count'] === 1): ?>
-<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.8rem;">
-  <span style="font-size:1.3rem;">⚠️</span>
+<div class="status-banner warning">
+  <div class="status-banner-icon">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+    </svg>
+  </div>
   <div>
-    <strong style="color:#7c5c3e;font-size:0.9rem;">No-Show Warning</strong>
-    <p style="color:#7c5c3e;font-size:0.83rem;margin:0.2rem 0 0;">You have <strong>1 no-show</strong> on record. A 2nd no-show will result in account suspension. Please cancel at least 24 hours in advance if you cannot attend.</p>
+    <p class="status-banner-title">No-Show Warning</p>
+    <p class="status-banner-desc">You have 1 no-show on record. A 2nd no-show will result in account suspension. Please cancel at least 24 hours in advance if you cannot attend.</p>
   </div>
 </div>
-<?php endif; ?> 
+<?php endif; ?>
  
       <div class="mb-4">
         <h3 style="font-family:var(--font-display);font-size:1.7rem;font-weight:600;">Good day, <?= htmlspecialchars(explode(' ', $_SESSION['user_name'])[0]) ?>.</h3>

@@ -10,3 +10,4 @@ $rootPath  = $rootPath  ?? '../';
 <link rel="icon" type="image/svg+xml" href="<?= $rootPath ?>assets/images/favicon.svg"/>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <link rel="stylesheet" href="<?= $rootPath ?>assets/css/style.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
