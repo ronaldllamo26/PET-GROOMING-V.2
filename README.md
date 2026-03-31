@@ -1,91 +1,75 @@
-# PawCare — Pet Grooming System v2
+# 🐾 PawCare — Pet Grooming Management System v2
 
-## Folder Structure
+<div align="center">
 
-```
-pawcare/
-├── index.php                  ← Landing page
-├── login.php                  ← Login (User + Admin, single page)
-├── register.php               ← Customer registration
-├── logout.php
-├── pawcare_db.sql             ← Database setup + seed data
-│
-├── config/
-│   ├── database.php           ← DB connection (PDO)
-│   └── auth.php               ← Session, role guards, helpers
-│
-├── includes/
-│   ├── head.php               ← Shared <head> HTML partial
-│   ├── sidebar_user.php       ← User sidebar nav
-│   └── sidebar_admin.php      ← Admin sidebar nav
-│
-├── views/
-│   ├── user/
-│   │   ├── dashboard.php      ← User home / overview
-│   │   ├── book.php           ← Book an appointment
-│   │   ├── my-pets.php        ← Manage pets
-│   │   ├── history.php        ← Appointment history
-│   │   └── profile.php        ← Edit profile / change password
-│   │
-│   └── admin/
-│       ├── dashboard.php      ← Admin overview / stats
-│       ├── appointments.php   ← Manage all bookings
-│       ├── services.php       ← Add / edit services
-│       └── users.php          ← View all users
-│
-└── assets/
-    ├── css/
-    │   └── style.css          ← All custom styles
-    ├── js/                    ← (add JS files here)
-    └── images/
-        ├── favicon.svg
-        ├── avatars/           ← User profile photos (future)
-        ├── pets/              ← Pet photos (future)
-        ├── services/          ← Service photos (future)
-        └── uploads/           ← User uploaded files (future)
-```
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-MariaDB-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Development-orange?style=for-the-badge)
 
-## Setup Instructions
+**A modern, full-stack web application for pet grooming businesses. Streamline appointments, manage pet profiles, and handle services with ease.**
 
-### 1. Database
-Import `pawcare_db.sql` via phpMyAdmin or terminal:
+</div>
+
+---
+
+## 📺 Project Demo
+
+
+https://github.com/user-attachments/assets/d187b269-4464-43fd-bb01-ca0bedc3cf6a
+
+
+
+---
+
+## 🚀 Key Features
+
+### 👤 Customer Side
+* **Online Booking:** Real-time scheduling for pet grooming services.
+* **Pet Management:** Create and manage multiple pet profiles (Name, Breed, Age).
+* **Booking History:** Track past and upcoming appointments.
+* **Secure Authentication:** User registration and login with role-based access.
+
+### 🛡️ Admin Dashboard
+* **Appointment Management:** Approve, decline, or update customer bookings.
+* **Service Catalog:** Add, edit, or remove grooming packages and prices.
+* **User Oversight:** View and manage registered customers.
+* **Quick Stats:** Overview of total appointments and active users.
+
+---
+
+## 📁 Project Structure
+
 ```bash
-mysql -u root -p < pawcare_db.sql
-```
-
-### 2. Configure DB Connection
-Edit `config/database.php`:
-```php
-define('DB_NAME', 'pet_grooming');  // your DB name
-define('DB_USER', 'root');          // your DB user
-define('DB_PASS', '');              // your DB password
-```
-
-### 3. Place in XAMPP
-Copy the entire `pawcare` folder to:
-```
+pawcare/
+├── config/              # DB connection (PDO) & Auth guards
+├── includes/            # Shared HTML partials (Heads, Sidebars)
+├── views/               
+│   ├── user/            # Customer-specific pages
+│   └── admin/           # Management tools (Services, Appointments)
+├── assets/              # UI/UX (CSS, JS, Images, Favicons)
+└── index.php            # Professional Landing Page
+🛠️ Installation Guide1. Database SetupOpen phpMyAdmin (http://localhost/phpmyadmin).Create a new database named pet_grooming.Import the pawcare_db.sql file.2. ConfigurationEdit config/database.php and update your credentials:PHPdefine('DB_NAME', 'pet_grooming');
+define('DB_USER', 'root'); 
+define('DB_PASS', ''); 
+3. Local Deployment
+Copy the folder to your XAMPP htdocs:
 C:\xampp\htdocs\pawcare\
-```
+Then access via: http://localhost/pawcare/
 
-### 4. Open in Browser
-```
-http://localhost/pawcare/
-http://localhost/pawcare/login.php
-```
+🔑 Default Credentials
+Role           │ Email                     │  Password
+Administrator  │ admin@pawcare.ph          │  password
+Customer       │ campusthrift77@gmail.com  │  password
+[!WARNING]
+Security Notice: Please change the default passwords immediately after your first login.
 
-## Default Login Accounts
+🎨 Tech Stack & Tools
+Backend: PHP 8+ (PDO for secure DB interactions)
+Database: MySQL / MariaDB
+Frontend: Bootstrap 5.3, Vanilla JavaScript
+Typography: Jost & Cormorant Garamond
+Design: Industrial Aesthetic with Glassmorphism accents
 
-| Role  | Email                        | Password   |
-|-------|------------------------------|------------|
-| Admin | admin@pawcare.ph             | password   |
-| User  | campusthrift77@gmail.com     | password   |
-
-> **Important:** Change passwords immediately after first login!
-
-## Tech Stack
-- PHP 8+ (PDO, sessions)
-- MySQL / MariaDB
-- Bootstrap 5.3
-- Vanilla JS
-- Google Fonts (Cormorant Garamond + Jost)
-- Unsplash (for photo placeholders)
+👨‍💻 Author
+🆂🆈🅽🆃🆄🆇🆉 - Web Developer
